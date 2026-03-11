@@ -2,29 +2,29 @@
 #include "bacnet/bacenum.h"
 
 /* WiFi settings */
-const bool USER_ENABLE_BACNET_IP = true;
-const char USER_WIFI_SSID[] = "BACnetBridge";
-const char USER_WIFI_PASS[] = "@Pi31416";
-const bool USER_WIFI_USE_STATIC_IP = true;
-const char USER_WIFI_STATIC_IP_ADDR[] = "10.120.245.94";
-const char USER_WIFI_STATIC_IP_GATEWAY[] = "10.210.245.254";
+const bool USER_ENABLE_BACNET_IP = false;
+const char USER_WIFI_SSID[] = "YOUR_WIFI_SSID";
+const char USER_WIFI_PASS[] = "YOUR_WIFI_PASSWORD";
+const bool USER_WIFI_USE_STATIC_IP = false;
+const char USER_WIFI_STATIC_IP_ADDR[] = "192.168.1.50";
+const char USER_WIFI_STATIC_IP_GATEWAY[] = "192.168.1.1";
 const char USER_WIFI_STATIC_IP_NETMASK[] = "255.255.255.0";
 
 /* BACnet device settings */
-const uint32_t USER_BACNET_DEVICE_INSTANCE = 31416;
+const uint32_t USER_BACNET_DEVICE_INSTANCE = 31418;
 const int USER_OVERRIDE_NVS_ON_FLASH = 1;
 
 /* BBMD foreign device registration */
-const uint8_t USER_BBMD_IP_OCTET_1 = 10;
-const uint8_t USER_BBMD_IP_OCTET_2 = 113;
-const uint8_t USER_BBMD_IP_OCTET_3 = 33;
+const uint8_t USER_BBMD_IP_OCTET_1 = 192;
+const uint8_t USER_BBMD_IP_OCTET_2 = 168;
+const uint8_t USER_BBMD_IP_OCTET_3 = 1;
 const uint8_t USER_BBMD_IP_OCTET_4 = 1;
 const uint16_t USER_BBMD_PORT = 0xBAC0;
 const uint16_t USER_BBMD_TTL_SECONDS = 600;
 
 /* BACnet MS/TP settings */
 const bool USER_ENABLE_BACNET_MSTP = true;
-const uint8_t USER_MSTP_MAC_ADDRESS = 6;
+const uint8_t USER_MSTP_MAC_ADDRESS = 21;
 const uint8_t USER_MSTP_MAX_INFO_FRAMES = 80;
 const uint8_t USER_MSTP_MAX_MASTER = 127;
 const uint32_t USER_MSTP_BAUD_RATE = 38400U;

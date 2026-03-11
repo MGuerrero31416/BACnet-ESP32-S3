@@ -1,6 +1,6 @@
-# ESP32 BACnet MS/TP WiFi Display
+# ESP32-S3 BACnet MS/TP WiFi Display
 
-ESP32-based BACnet/IP device with ST7789 TFT display featuring 20 BACnet objects: 4 Analog Values, 4 Binary Values, 4 Analog Inputs, 4 Binary Inputs, and 4 Binary Outputs. Includes built-in PMS5003 air quality sensor for PM2.5/PM1.0/PM10 monitoring.
+ESP32-S3 based BACnet/IP device with TFT display featuring 20 BACnet objects: 4 Analog Values, 4 Binary Values, 4 Analog Inputs, 4 Binary Inputs, and 4 Binary Outputs. Includes built-in PMS5003 air quality sensor for PM2.5/PM1.0/PM10 monitoring.
 
 It can simultaneously connect the BACnet device through WiFi (BACnet/IP), WiFi to Ethernet bridge, and MS/TP (RS485 using a MAX485 module).
 
@@ -33,30 +33,30 @@ You can easily add extra BACnet objects and map them to ESP32 GPIO for analog an
 
 ## Hardware Requirements
 
-- **Microcontroller**: ESP32-WROOM-32
-- **Display**: ST7789 SPI TFT (170x320 pixels)
+- **Microcontroller**: ESP32-S3
+- **Display**: ST7796S SPI TFT (320x480 panel, rotation 3 used)
 - **Display Connections**:
-  - MOSI: GPIO 23
-  - SCLK: GPIO 18
-  - CS: GPIO 15
-  - DC: GPIO 2
-  - RST: GPIO 4
-  - BL (Backlight): GPIO 32
+  - MOSI (SDA): GPIO 10
+  - SCLK (SCL): GPIO 9
+  - CS: GPIO 13
+  - DC: GPIO 12
+  - RST: GPIO 11
+  - BL (Backlight): GPIO 14
 
 ## Hardware Components
 
-### ST7789 TFT Display
-- **Resolution**: 170x320 pixels
+### ST7796S TFT Display
+- **Resolution**: 320x480 pixels
 - **Interface**: SPI (4-wire)
-- **Driver**: Custom TFT_eSPI component with offset calibration for clone displays
+- **Driver**: Adafruit ST7735 and ST7789 Library (using ST7796S driver)
 
 ### PMS5003 Air Quality Sensor
 - **Model**: Plantower PMS5003
 - **Communication**: UART (9600 baud, 8N1)
 - **Connections**:
-  - PMS5003 TX → ESP32 GPIO25 (RX1)
-  - PMS5003 RX → ESP32 GPIO26 (TX1)
-  - SET (Sleep Control): GPIO 27 (LOW = AWAKE, HIGH = SLEEP) — controlled by BO1 (PMS5003_SET)
+  - PMS5003 TX → ESP32 GPIO5
+  - PMS5003 RX → ESP32 GPIO4
+  - RST (Reset) → ESP32 GPIO6
   - Power: 5V (requires 5V supply, not 3.3V)
   - GND: ESP32 GND
 - **Measurements**:
@@ -76,35 +76,36 @@ You can easily add extra BACnet objects and map them to ESP32 GPIO for analog an
 ### WiFi Connectivity
 - Built-in ESP32 WiFi for BACnet/IP communication
 - Configured via [main/User_Settings.c](main/User_Settings.c)
+- Default values in [main/User_Settings.c](main/User_Settings.c) use placeholders (`YOUR_WIFI_SSID` / `YOUR_WIFI_PASSWORD`) and should be changed for your environment
 - Static IP option in [main/User_Settings.c](main/User_Settings.c). Set `USER_WIFI_USE_STATIC_IP` to 1 or 0
 
 ### BACnet MS/TP (RS485)
 - **Transceiver**: MAX485 or equivalent RS485 converter
 - **UART**: UART2
 - **Connections**:
-  - DI (TX) → ESP32 GPIO17
-  - RO (RX) → ESP32 GPIO16
-  - DE/RE → ESP32 GPIO5
+  - RO (RX) → ESP32 GPIO17 (ESP32-S3 U1 TXD)
+  - DI (TX) → ESP32 GPIO18 (ESP32-S3 U1 RXD)
+  - DE/RE → ESP32 GPIO16
 - **Baud Rate**: 38400 (default)
-- **MS/TP Settings**: MAC 6, Max Master 127, Max Info Frames 80
+- **MS/TP Settings**: MAC 21, Max Master 127, Max Info Frames 80
 - **Discovery**: Some controllers (e.g., NAE) require manual add on the MS/TP field bus
 
 ## GPIO Summary
 
 | Pin     | Component   | Signal              | Definition |
 |---------|-------------|---------------------|------------|
-| GPIO 2  | TFT Display | DC (Data/Command)   | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 4  | TFT Display | RST (Reset)         | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 15 | TFT Display | CS (Chip Select)    | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 18 | TFT Display | SCLK (SPI Clock)    | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 23 | TFT Display | MOSI (SPI Data)     | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 32 | TFT Display | BACKLIGHT           | [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h)
-| GPIO 16 | MAX485      | RO (RX)             | [main/mstp_rs485.c](main/mstp_rs485.c)
-| GPIO 17 | MAX485      | DI (TX)             | [main/mstp_rs485.c](main/mstp_rs485.c)
-| GPIO 5  | MAX485      | DE/RE               | [main/mstp_rs485.c](main/mstp_rs485.c)
-| GPIO 25 | PMS5003     | RX (sensor TX)      | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
-| GPIO 26 | PMS5003     | TX (sensor RX)      | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
-| GPIO 27 | PMS5003     | SET (Sleep Control) | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
+| GPIO 4  | PMS5003     | TX (sensor RX)      | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
+| GPIO 5  | PMS5003     | RX (sensor TX)      | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
+| GPIO 6  | PMS5003     | RST (Reset)         | [components/pms5003/pms5003.h](components/pms5003/pms5003.h)
+| GPIO 9  | TFT Display | SCLK (SPI Clock)    | [main/display.cpp](main/display.cpp)
+| GPIO 10 | TFT Display | MOSI SDA (SPI Data) | [main/display.cpp](main/display.cpp)
+| GPIO 11 | TFT Display | RST (Reset)         | [main/display.cpp](main/display.cpp)
+| GPIO 12 | TFT Display | DC (Data/Command)   | [main/display.cpp](main/display.cpp)
+| GPIO 13 | TFT Display | CS (Chip Select)    | [main/display.cpp](main/display.cpp)
+| GPIO 14 | TFT Display | BACKLIGHT           | [main/display.cpp](main/display.cpp)
+| GPIO 16 | MAX485      | DE/RE               | [main/mstp_rs485.c](main/mstp_rs485.c)
+| GPIO 17 | MAX485      | RO (RX)             | [main/mstp_rs485.c](main/mstp_rs485.c)
+| GPIO 18 | MAX485      | DI (TX)             | [main/mstp_rs485.c](main/mstp_rs485.c)
 
 
 ## Build Requirements
@@ -116,7 +117,7 @@ You can easily add extra BACnet objects and map them to ESP32 GPIO for analog an
 ## Building
 
 ```bash
-cd c:\git\BACnet-ESP32-Display
+cd c:\git\BACnet-ESP32-S3
 idf.py build
 ```
 
@@ -136,16 +137,14 @@ idf.py monitor -p COM3
 
 ## Configuration
 
-### Display Offset Calibration
+### Display Driver Settings
 
-The ST7789 display has a framebuffer offset that's compensated in [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h):
+Display initialization and pin mapping are configured in [main/display.cpp](main/display.cpp), including:
 
-```c
-#define TFT_OFFSET_X 0   // Horizontal offset
-#define TFT_OFFSET_Y 0   // Vertical offset
-```
-
-Legacy `TFT_COLSTART`/`TFT_ROWSTART` examples are also present in comments in the same file; use one offset method consistently.
+- `SPI.begin(9, -1, 10, 13)`
+- `tft.init(320, 480, 0, 0, ST7796S_BGR)`
+- `tft.invertDisplay(true)`
+- `tft.setRotation(3)`
 
 ### FreeRTOS Configuration
 
@@ -186,7 +185,9 @@ Most user-configurable settings are centralized in [main/User_Settings.c](main/U
 ### Components
 
 - **[components/bacnet-stack](components/bacnet-stack)** - BACnet/IP stack (modified from bacnet-stack/bacnet-stack)
-- **[components/TFT_eSPI](components/TFT_eSPI)** - TFT graphics library
+- **[components/Adafruit_BusIO](components/Adafruit_BusIO)** - Adafruit BusIO support library
+- **[components/Adafruit_GFX_Library](components/Adafruit_GFX_Library)** - Adafruit graphics primitives
+- **[components/Adafruit_ST7735_and_ST7789_Library](components/Adafruit_ST7735_and_ST7789_Library)** - Adafruit ST77xx/ST7796S driver library
 - **[main](main/)** - Application code
   - `main.c` - BACnet initialization and main loop
   - `analog_value.c/h` - Analog Value object creation and NVS persistence
@@ -216,7 +217,7 @@ The device broadcasts its Device ID and manages BACnet objects that can be read/
 
 ### BACnet Objects Exposed
 
-- **Device**: 31416 (configurable in [main/User_Settings.c](main/User_Settings.c))
+- **Device**: 31418 (configurable in [main/User_Settings.c](main/User_Settings.c))
 - **Analog Values**: Instance 1, 2, 3, 4
 - **Binary Values**: Instance 1, 2, 3, 4
 - **Analog Inputs**: Instance 1, 2, 3, 4
@@ -240,20 +241,20 @@ For a list of specific changes, see [BACNET_STACK_CHANGES.md](BACNET_STACK_CHANG
 The display code uses boundary constants for easy layout modification:
 
 ```c
-#define DISP_X0    17      // Left edge
-#define DISP_Y0    40      // Top edge
-#define DISP_X1    151     // Right edge
-#define DISP_Y1    278     // Bottom edge
-#define DISP_WIDTH 135
-#define DISP_HEIGHT 239
+#define DISP_X0    0
+#define DISP_Y0    0
+#define DISP_X1    479
+#define DISP_Y1    319
+#define DISP_WIDTH 480
+#define DISP_HEIGHT 320
 ```
 
 Position all elements relative to these constants to avoid hardcoding coordinates.
 
 ## Troubleshooting
 
-### Display offset issues
-If text appears misaligned, adjust `TFT_OFFSET_X` and `TFT_OFFSET_Y` in [components/TFT_eSPI/User_Setup.h](components/TFT_eSPI/User_Setup.h) and recompile.
+### Display orientation or color issues
+If display output looks mirrored, rotated, or has swapped colors, adjust ST7796S init parameters and rotation in [main/display.cpp](main/display.cpp) and recompile.
 
 ### WiFi connection fails
 Check SSID/password in [main/User_Settings.c](main/User_Settings.c), then verify WiFi init/connection flow in [main/wifi_helper.c](main/wifi_helper.c).
@@ -267,6 +268,6 @@ Ensure `CONFIG_FREERTOS_HZ=1000` is set in [sdkconfig](sdkconfig) and rebuild wi
 - [BACnet Stack GitHub](https://github.com/bacnet-stack/bacnet-stack)
 - [ESP-IDF Documentation](https://docs.espressif.com/projects/esp-idf/en/stable/)
 - [Arduino-ESP32 GitHub](https://github.com/espressif/arduino-esp32)
-- [TFT_eSPI GitHub](https://github.com/Bodmer/TFT_eSPI)
+- [Adafruit ST7735 and ST7789 Library GitHub](https://github.com/adafruit/Adafruit-ST7735-Library)
 
 

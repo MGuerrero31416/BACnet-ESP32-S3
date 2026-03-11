@@ -16,7 +16,7 @@
 
 3. **Navigate to project directory**:
    ```powershell
-   cd C:\esp\BACnet-ESP32-Display
+   cd C:\esp\BACnet-ESP32-S3
    ```
 
 4. **Build the project**:

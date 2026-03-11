@@ -66,6 +66,16 @@ static volatile uint32_t mstp_rp_total = 0;
 static volatile uint32_t mstp_wp_total = 0;
 static float mstp_rp_last_value = 0.0f;
 
+static bool wifi_connected_now(void)
+{
+    if (!USER_ENABLE_BACNET_IP) {
+        return false;
+    }
+
+    wifi_ap_record_t ap_info = {0};
+    return esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK;
+}
+
 static void bacnet_log_whois_iam(const uint8_t *apdu, int apdu_len, const char *link)
 {
     if (!apdu || apdu_len < 2) {
@@ -362,6 +372,8 @@ void app_main(void)
     uint32_t display_tick = 0;
     uint32_t iam_tick = 0;
     uint32_t mstp_rx_tick = 0;
+    uint32_t mstp_last_seen_pdu = 0;
+    uint8_t mstp_alive_ticks = 0;
     while (1) {
         if (USER_ENABLE_BACNET_IP) {
             bacnet_datalink_lock(datalink_bip);
@@ -383,6 +395,21 @@ void app_main(void)
             mstp_rp_total = 0;
             mstp_wp_total = 0;
         }
+
+        if (USER_ENABLE_BACNET_MSTP) {
+            if (mstp_pdu_count != mstp_last_seen_pdu) {
+                mstp_last_seen_pdu = mstp_pdu_count;
+                mstp_alive_ticks = 6;
+            } else if (mstp_alive_ticks > 0) {
+                mstp_alive_ticks--;
+            }
+        } else {
+            mstp_alive_ticks = 0;
+        }
+
+        display_set_link_status(
+            wifi_connected_now(),
+            USER_ENABLE_BACNET_MSTP && (mstp_alive_ticks > 0));
         
         /* Update display every 2 seconds */
         if (++display_tick % 2 == 0) {
@@ -405,13 +432,25 @@ void app_main(void)
 static void bacnet_cov_task(void *pvParameters)
 {
     (void)pvParameters;
-    uint32_t tick = 0;
     while (1) {
-        bacnet_datalink_lock(datalink_bip);
-        handler_cov_timer_seconds(1);
-        handler_cov_task();
-        bacnet_datalink_unlock();
-        tick++;
+        char *active_datalink = datalink_default;
+        if (!active_datalink) {
+            if (USER_ENABLE_BACNET_IP) {
+                active_datalink = datalink_bip;
+            } else if (USER_ENABLE_BACNET_MSTP) {
+                active_datalink = datalink_mstp;
+            }
+        }
+
+        if (active_datalink) {
+            bacnet_datalink_lock(active_datalink);
+            handler_cov_timer_seconds(1);
+            handler_cov_task();
+            bacnet_datalink_unlock();
+        } else {
+            handler_cov_timer_seconds(1);
+        }
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

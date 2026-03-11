@@ -9,11 +9,7 @@
 
 static const char *TAG = "PMS5003";
 
-// GPIO pins for PMS5003 (crossed UART)
-#define PMS5003_RX_PIN 25      // ESP32 RX on GPIO 25
-#define PMS5003_TX_PIN 26      // ESP32 TX on GPIO 26
-#define PMS5003_SET_PIN 27     // SET pin (LOW = awake, HIGH = sleep)
-#define PMS5003_UART_NUM UART_NUM_1
+// Pin and UART selection are defined in pms5003.h
 #define PMS5003_UART_BAUD 9600
 #define PMS5003_BUF_SIZE 1024
 
@@ -28,7 +24,7 @@ void pms5003_init(void)
 {
     // ESP_LOGI(TAG, "Initializing PMS5003 sensor...");
     
-    // Configure PMS5003_SET pin (LOW = awake, HIGH = sleep)
+    // Configure PMS5003 RST pin (active LOW reset)
     gpio_config_t gpio_cfg = {
         .pin_bit_mask = (1ULL << PMS5003_SET_PIN),
         .mode = GPIO_MODE_OUTPUT,
@@ -37,8 +33,8 @@ void pms5003_init(void)
         .intr_type = GPIO_INTR_DISABLE,
     };
     gpio_config(&gpio_cfg);
-    gpio_set_level(PMS5003_SET_PIN, 0);  // Start with sensor AWAKE (LOW)
-    // ESP_LOGI(TAG, "GPIO%d configured as PMS5003_SET (set to AWAKE)", PMS5003_SET_PIN);
+    gpio_set_level(PMS5003_SET_PIN, 1);  // Deassert reset (normal operation)
+    // ESP_LOGI(TAG, "GPIO%d configured as PMS5003_RST (deasserted)", PMS5003_SET_PIN);
     
     // Configure UART1 for PMS5003
     uart_config_t uart_config = {
@@ -297,15 +293,15 @@ void pms5003_get_data(pms5003_data_t *data)
     }
 }
 /**
- * @brief Control PMS5003 SET pin from BACnet Binary Output
- * OFF/INACTIVE (0) = AWAKE (LOW)
- * ON/ACTIVE (1) = SLEEP (HIGH)
+ * @brief Control PMS5003 RST pin from BACnet Binary Output
+ * OFF/INACTIVE (0) = normal operation (HIGH)
+ * ON/ACTIVE (1) = reset asserted (LOW)
  */
 void pms5003_set_gpio_from_bo(uint32_t state)
 {
-    uint32_t gpio_level = (state != 0) ? 1 : 0;  // 1 = sleep, 0 = awake
+    uint32_t gpio_level = (state != 0) ? 0 : 1;  // Active-low reset
     gpio_set_level(PMS5003_SET_PIN, gpio_level);
-    ESP_LOGI(TAG, "PMS5003_SET (GPIO%u)=%lu (%s)",
+    ESP_LOGI(TAG, "PMS5003_RST (GPIO%u)=%lu (%s)",
              (unsigned)PMS5003_SET_PIN, gpio_level,
-             gpio_level ? "SLEEP" : "AWAKE");
+             gpio_level ? "RUN" : "RESET");
 }

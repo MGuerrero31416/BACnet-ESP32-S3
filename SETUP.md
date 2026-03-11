@@ -48,7 +48,7 @@ The ESP-IDF environment uses Python
 C:\path\to\esp-idf\export.bat
 
 # Build the project
-cd C:\path\to\BACnet-ESP32-Display
+cd C:\path\to\BACnet-ESP32-S3
 idf.py build
 
 # Flash to device
