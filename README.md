@@ -27,9 +27,10 @@ You can easily add extra BACnet objects and map them to ESP32 GPIO for analog an
 - **Air Quality Monitoring**: PMS5003 PM2.5/PM1.0/PM10 sensor with automatic BACnet integration
 
 ## Photos
-![ESP32 NAE](docs/images/ESP32_BACnet.jpg)
-![ESP32 Metasys](docs/images/ESP32_Metasys.jpg)
+![ESP32-S3](docs/images/ESP32-S3.jpg)
+![Display](docs/images/Display.jpg)
 ![YABE Tool](docs/images/YABE.png)
+![Setup](docs/images/Setup.jpg)
 
 ## Hardware Requirements
 
