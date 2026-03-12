@@ -14,6 +14,7 @@ extern const char USER_WIFI_STATIC_IP_GATEWAY[];
 extern const char USER_WIFI_STATIC_IP_NETMASK[];
 
 /* BACnet device settings */
+extern const char USER_BACNET_DEVICE_NAME[];
 extern const uint32_t USER_BACNET_DEVICE_INSTANCE;
 extern const int USER_OVERRIDE_NVS_ON_FLASH;
 

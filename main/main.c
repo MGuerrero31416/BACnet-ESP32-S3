@@ -306,7 +306,7 @@ void app_main(void)
     Device_Init(NULL);
     Device_Set_Object_Instance_Number(USER_BACNET_DEVICE_INSTANCE);
     Device_Set_Vendor_Identifier(260);
-    Device_Object_Name_ANSI_Init("ESP32-BACnet");
+    Device_Object_Name_ANSI_Init(USER_BACNET_DEVICE_NAME);
 
     /* Register service handlers - using bacnet-stack library handlers */
     ESP_LOGI(TAG, "Registering BACnet service handlers");

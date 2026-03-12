@@ -1,16 +1,18 @@
 #include "User_Settings.h"
 #include "bacnet/bacenum.h"
 
+/* BACnet device settings */
+const char USER_BACNET_DEVICE_NAME[] = "ESP32-S3";
+
 /* WiFi settings */
-const bool USER_ENABLE_BACNET_IP = false;
-const char USER_WIFI_SSID[] = "YOUR_WIFI_SSID";
-const char USER_WIFI_PASS[] = "YOUR_WIFI_PASSWORD";
-const bool USER_WIFI_USE_STATIC_IP = false;
-const char USER_WIFI_STATIC_IP_ADDR[] = "192.168.1.50";
-const char USER_WIFI_STATIC_IP_GATEWAY[] = "192.168.1.1";
+const bool USER_ENABLE_BACNET_IP = true;
+const char USER_WIFI_SSID[] = "BACnetBridge";
+const char USER_WIFI_PASS[] = "xxxx";
+const bool USER_WIFI_USE_STATIC_IP = true;
+const char USER_WIFI_STATIC_IP_ADDR[] = "10.120.245.96";
+const char USER_WIFI_STATIC_IP_GATEWAY[] = "10.210.245.254";
 const char USER_WIFI_STATIC_IP_NETMASK[] = "255.255.255.0";
 
-/* BACnet device settings */
 const uint32_t USER_BACNET_DEVICE_INSTANCE = 31418;
 const int USER_OVERRIDE_NVS_ON_FLASH = 1;
 
