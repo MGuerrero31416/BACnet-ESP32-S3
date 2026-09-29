@@ -1,3 +1,5 @@
+# OBSOLETE - Latest development on https://github.com/MGuerrero31416/ESP32-BACnet-Master
+
 # ESP32-S3 BACnet MS/TP WiFi Display
 
 ESP32-S3 based BACnet/IP device with TFT display featuring 20 BACnet objects: 4 Analog Values, 4 Binary Values, 4 Analog Inputs, 4 Binary Inputs, and 4 Binary Outputs. Includes built-in PMS5003 air quality sensor for PM2.5/PM1.0/PM10 monitoring.
